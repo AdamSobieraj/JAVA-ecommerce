@@ -31,18 +31,6 @@ public class KafkaConsumerConfig {
   @Value("${vox.transport.kafka.security-protocol}")
   private String securityProtocol;
 
-  @Value("${vox.transport.kafka.ssl.truststore-location}")
-  private String truststoreLocation;
-
-  @Value("${vox.transport.kafka.ssl.truststore-password}")
-  private String truststorePassword;
-
-  @Value("${vox.transport.kafka.ssl.keystore-location}")
-  private String keystoreLocation;
-
-  @Value("${vox.transport.kafka.ssl.keystore-password}")
-  private String keystorePassword;
-
   @Bean
   public ConsumerFactory< String, byte[]> consumerFactory() {
     Map<String, Object> config = new HashMap<>();
@@ -55,14 +43,6 @@ public class KafkaConsumerConfig {
     config.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
     config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
     config.put("security.protocol", securityProtocol);
-
-    if ("SSL".equalsIgnoreCase(securityProtocol)) {
-      config.put("ssl.truststore.location", truststoreLocation);
-      config.put("ssl.truststore.password", truststorePassword);
-      config.put("ssl.keystore.location", keystoreLocation);
-      config.put("ssl.keystore.password", keystorePassword);
-      config.put("ssl.endpoint.identification.algorithm", "HTTPS");
-    }
 
     return new DefaultKafkaConsumerFactory<>(config);
   }

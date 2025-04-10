@@ -5,6 +5,8 @@ import ecom.pl.ecommerce_shop.promotion.PromotionExecutorImp;
 import ecom.pl.ecommerce_shop.promotion.PromotionMode;
 import ecom.pl.ecommerce_shop.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -18,6 +20,10 @@ public class CartService {
     private final UserService userService;
     private final PromotionExecutorImp promotionExecutorImp;
     private final PromotionCodeRepository promotionCodeRepository;
+
+    @Setter
+    @Value("${promotion.level}")
+    private Integer promotionLevel;
 
 
     public void addProduct(CartItem cartItem) {
@@ -78,7 +84,7 @@ public class CartService {
 
         boolean activePromotion = promotionCode.isPresent() && promotionCode.get().getActive();
 
-        if (activePromotion && totalPrice > 100) {
+        if (activePromotion && totalPrice > promotionLevel) {
             totalPrice = promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, totalPrice);
         }
         else {
@@ -93,6 +99,5 @@ public class CartService {
 
         return totalPrice;
     }
-
 
 }

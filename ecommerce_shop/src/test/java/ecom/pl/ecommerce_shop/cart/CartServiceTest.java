@@ -1,12 +1,11 @@
 package ecom.pl.ecommerce_shop.cart;
 
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import ecom.pl.ecommerce_shop.database.*;
 import ecom.pl.ecommerce_shop.promotion.PromotionExecutorImp;
 import ecom.pl.ecommerce_shop.promotion.PromotionMode;
 import ecom.pl.ecommerce_shop.user.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,9 +37,13 @@ class CartServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-
     @InjectMocks
     private CartService cartService;
+
+    @BeforeEach
+    void setUp() {
+        cartService.setPromotionLevel(2);  // Manually setting the promotion level
+    }
 
     @ParameterizedTest
     @CsvSource({
