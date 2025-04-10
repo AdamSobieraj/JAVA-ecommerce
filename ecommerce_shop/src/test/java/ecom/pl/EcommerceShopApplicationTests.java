@@ -1,10 +1,9 @@
-package ecom.pl.ecommerce;
+package ecom.pl;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EcommerceApplicationTests {
+class EcommerceShopApplicationTests {
 
 //    @Test
 //    void contextLoads() {

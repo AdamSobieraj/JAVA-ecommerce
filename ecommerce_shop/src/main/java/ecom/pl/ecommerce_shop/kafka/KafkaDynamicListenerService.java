@@ -77,6 +77,8 @@ public class KafkaDynamicListenerService {
           .issuer(topic.getIssuer())
           .build();
 
+      System.out.println("Kafka alive");
+
       // save to db
     });
 
