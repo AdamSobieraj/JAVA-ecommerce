@@ -1,0 +1,66 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+<!--    Template for new migrations, remember always to:-->
+<!--    - treat 000 as index of change and increment it +1-->
+<!--    - always add rollback script-->
+<!--    -->
+<!--    <changeSet id="000-ecom-type-of-action.sql" author="ecom">-->
+<!--        <sqlFile path="create/000-ecom-type-of-action.sql" relativeToChangelogFile="true" endDelimiter="go" />-->
+<!--        <rollback>-->
+<!--            <sqlFile path="drop/000-ecom-type-of-action.sql" relativeToChangelogFile="true"/>-->
+<!--        </rollback>-->
+<!--    </changeSet>-->
+<!--    -->
+
+        <changeSet id="001-ecom-create-table-raw-data-import.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/001-ecom-create-table-product.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/001-ecom-drop-table-product.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+        <changeSet id="002-ecom-add-products.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/002-ecom-add-products.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/002-ecom-remove-items.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+        <changeSet id="003-ecom-add-table-cart.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/003-ecom-add-table-cart.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/003-ecom-drop-table-cart.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+        <changeSet id="004-ecom-add-table-user-addres.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/004-ecom-add-table-user-addres.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/004-ecom-drop-table-user-addres.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+        <changeSet id="005-ecom-fill-table-user-addres.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/005-ecom-fill-table-user-addres.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/005-ecom-remove-table-user-addres.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+        <changeSet id="006-ecom-add-table-promotion-codes.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/006-ecom-add-table-promotion-codes.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/006-ecom-drop-table-promotion-codes.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+        <changeSet id="007-ecom-fill-table-promotion-codes.sql" author="ecom">
+            <sqlFile path="db/v1.0/create/007-ecom-fill-table-promotion-codes.sql" dbms="postgresql" encoding="UTF-8" />
+            <rollback>
+                <sqlFile path="db/v1.0/drop/007-ecom-remove-data-promotion-codes.sql" dbms="postgresql" encoding="UTF-8"/>
+            </rollback>
+        </changeSet>
+
+</databaseChangeLog>
