@@ -1,12 +1,18 @@
 package ecom.pl.ecommerce_mag;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ecom.pl.ecommerce_mag.config.KafkaProducerBuilder;
+import ecom.pl.ecommerce_mag.dto.ProductDto;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
@@ -27,7 +33,7 @@ public class EcommerceMagApplication {
                     String source = entry.getValue();
 
                     if ("file".equals(source)) {
-                        byte[] fileContent = "</br>to jest test płaśli siężźęł</br>".getBytes();
+                        byte[] fileContent = getProducts();
                         ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, null, fileContent);
                         producer.send(record);
                         System.out.println("Sent binary file to " + topic);
@@ -67,4 +73,19 @@ public class EcommerceMagApplication {
         return topicSources;
 
     }
+
+    public static byte [] getProducts() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        InputStream inputStream = EcommerceMagApplication.class.getResourceAsStream("/data/products.json");
+
+        byte[] data;
+        try {
+            List<ProductDto> products = objectMapper.readValue(inputStream, new TypeReference<List<ProductDto>>() {});
+            data = objectMapper.writeValueAsBytes(products);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return data;
+    }
+
 }

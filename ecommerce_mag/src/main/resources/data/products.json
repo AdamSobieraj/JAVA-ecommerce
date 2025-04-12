@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Apple",
+    "price": 0.99,
+    "category": "Fruit",
+    "available": true
+  },
+  {
+    "name": "Bread",
+    "price": 2.49,
+    "category": "Bakery",
+    "available": true
+  },
+  {
+    "name": "Milk",
+    "price": 1.79,
+    "category": "Dairy",
+    "available": false
+  }
+]

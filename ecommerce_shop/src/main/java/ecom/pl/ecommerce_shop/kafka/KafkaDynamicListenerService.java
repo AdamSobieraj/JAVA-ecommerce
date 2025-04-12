@@ -1,6 +1,7 @@
 package ecom.pl.ecommerce_shop.kafka;
 
-import ecom.pl.ecommerce_shop.database.DataImport;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ecom.pl.ecommerce_shop.product.ProductDto;
 import jakarta.annotation.PostConstruct;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -13,8 +14,10 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,14 +73,20 @@ public class KafkaDynamicListenerService {
 
       Message<byte[]> message = new GenericMessage<>(record.value(), headers);
 
-      DataImport rawDataImport = DataImport.builder()
-          .id(UUID.randomUUID())
-          .timestamp(LocalDateTime.now())
-          .status(Status.IMPORTED)
-          .issuer(topic.getIssuer())
-          .build();
+      ObjectMapper objectMapper = new ObjectMapper();
 
-      System.out.println("Kafka alive");
+      List<ProductDto> products;
+
+      try {
+          products = objectMapper.readValue(message.getPayload(), objectMapper.getTypeFactory()
+                  .constructCollectionType(List.class, ProductDto.class));
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+
+      products.forEach(product -> {
+        System.out.println("Received product: " + product.getName() + ", Price: " + product.getPrice());
+      });
 
       // save to db
     });
