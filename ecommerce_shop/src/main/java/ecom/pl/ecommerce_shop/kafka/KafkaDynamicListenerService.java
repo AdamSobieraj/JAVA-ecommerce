@@ -66,11 +66,6 @@ public class KafkaDynamicListenerService {
       Map<String, Object> headers = new HashMap<>();
       record.headers().forEach(header -> headers.put(header.key(), new String(header.value())));
 
-      headers.put("kafka_receivedPartitionId", record.partition());
-      headers.put("kafka_receivedTimestamp", record.timestamp());
-      headers.put("kafka_receivedTopic", record.topic());
-      headers.put("kafka_offset", record.offset());
-
       Message<byte[]> message = new GenericMessage<>(record.value(), headers);
 
       ObjectMapper objectMapper = new ObjectMapper();
@@ -89,6 +84,8 @@ public class KafkaDynamicListenerService {
       });
 
       // save to db
+      magUpdateService.updateMag(products);
+
     });
 
     KafkaMessageListenerContainer< String, byte[]> container =

@@ -27,7 +27,8 @@ public class EcommerceMagApplication {
 
         try {
             int i = 0;
-            while (true) {
+            boolean loop = true;
+            while (loop) {
                 for (Map.Entry<String, String> entry : topicSources.entrySet()) {
                     String topic = entry.getKey();
                     String source = entry.getValue();
@@ -37,6 +38,7 @@ public class EcommerceMagApplication {
                         ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, null, fileContent);
                         producer.send(record);
                         System.out.println("Sent binary file to " + topic);
+                        loop = false;
                     } else {
                         String message = source + " - Message number " + i;
                         System.out.println("DATA 22 : " + message.getBytes().length);
