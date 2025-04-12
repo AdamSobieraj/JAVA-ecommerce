@@ -22,13 +22,14 @@
         <exchange-rate>1.0.12</exchange-rate>
         <springdoc-openapi-ui>1.7.0</springdoc-openapi-ui>
         <openapi-webmvc-core>1.7.0</openapi-webmvc-core>
+        <org.springdoc>2.8.5</org.springdoc>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.5</version>
+            <version>${org.springdoc}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -87,11 +88,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
