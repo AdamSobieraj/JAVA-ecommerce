@@ -59,6 +59,12 @@ public class ProductService {
         productRepository.deleteById(Long.valueOf(product));
     }
 
+    public List<Product> displayProductsByCategory(String category) {
 
+        return productRepository.findAvailableProductsByCategoryOrderedByPrice(category);
+    }
 
+    public List<String> findAllAvailableCategories() {
+        return productRepository.findAllAvailableCategories();
+    }
 }

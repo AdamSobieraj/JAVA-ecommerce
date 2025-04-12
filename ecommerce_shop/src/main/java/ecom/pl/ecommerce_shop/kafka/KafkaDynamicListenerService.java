@@ -23,16 +23,16 @@ public class KafkaDynamicListenerService {
 
   private final DefaultKafkaConsumerFactory<String, byte[]> consumerFactory;
   private final KafkaTopicProperties topicProperties;
-  private final ImportService importService;
+  private final MagUpdateService magUpdateService;
 
   @Value("${kafka.group-id}")
   private String groupId;
 
   public KafkaDynamicListenerService(DefaultKafkaConsumerFactory<String, byte[]> consumerFactory,
-      KafkaTopicProperties topicProperties, ImportService importService) {
+      KafkaTopicProperties topicProperties, MagUpdateService magUpdateService) {
     this.consumerFactory = consumerFactory;
     this.topicProperties = topicProperties;
-    this.importService = importService;
+    this.magUpdateService = magUpdateService;
   }
 
   @PostConstruct
