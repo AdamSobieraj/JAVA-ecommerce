@@ -2,6 +2,10 @@ package ecom.pl.ecommerce_shop.cart;
 
 
 import ecom.pl.ecommerce_shop.database.*;
+import ecom.pl.ecommerce_shop.exchange.Currency;
+import ecom.pl.ecommerce_shop.exchange.CurrencyExchangeService;
+import ecom.pl.ecommerce_shop.exchange.ExchangeRequest;
+import ecom.pl.ecommerce_shop.exchange.ExchangeResult;
 import ecom.pl.ecommerce_shop.promotion.PromotionExecutorImp;
 import ecom.pl.ecommerce_shop.promotion.PromotionMode;
 import ecom.pl.ecommerce_shop.user.UserService;
@@ -13,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -36,6 +41,9 @@ class CartServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private CurrencyExchangeService currencyExchangeService;
 
     @InjectMocks
     private CartService cartService;
@@ -128,11 +136,15 @@ class CartServiceTest {
                 .password("password")
                 .build();
 
+        ExchangeResult exchangeResult = new ExchangeResult();
+                exchangeResult.setAmount(new BigDecimal(100));
+
         when(userService.findUserByUsername(any())).thenReturn(Optional.of(user));
         when(userService.getUserFromSecurityContext()).thenReturn(String.valueOf(user));
         when(cartRepository.findAllByUserId(any(UUID.class))).thenReturn(Optional.of(cartList));
         when(productRepository.findById(cartItem.getProductId())).thenReturn(product);
         when(promotionCodeRepository.findById(promotionCodeUUID)).thenReturn(Optional.of(promotionCode));
+        when(currencyExchangeService.exchange(any())).thenReturn(exchangeResult);
         lenient().when(promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, productAmount))
                 .thenReturn(expectedTotalPrice);
         lenient().when(promotionExecutorImp.processPromotionMap(PromotionMode.BUY_2_GET_SEC_HALF, orderMap, productAmount))

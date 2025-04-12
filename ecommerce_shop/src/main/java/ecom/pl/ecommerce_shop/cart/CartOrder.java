@@ -11,4 +11,5 @@ import java.util.Map;
 public class CartOrder {
     Map<Product, Integer> orderMap;
     Double totalPrice;
+    Double totalPriceUSD;
 }

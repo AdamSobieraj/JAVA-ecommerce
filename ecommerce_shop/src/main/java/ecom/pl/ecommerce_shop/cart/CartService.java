@@ -1,6 +1,8 @@
 package ecom.pl.ecommerce_shop.cart;
 
 import ecom.pl.ecommerce_shop.database.*;
+import ecom.pl.ecommerce_shop.exchange.*;
+import ecom.pl.ecommerce_shop.exchange.Currency;
 import ecom.pl.ecommerce_shop.promotion.PromotionExecutorImp;
 import ecom.pl.ecommerce_shop.promotion.PromotionMode;
 import ecom.pl.ecommerce_shop.user.UserService;
@@ -9,6 +11,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Component
@@ -20,6 +23,7 @@ public class CartService {
     private final UserService userService;
     private final PromotionExecutorImp promotionExecutorImp;
     private final PromotionCodeRepository promotionCodeRepository;
+    private final CurrencyExchangeService currencyExchangeService;
 
     @Setter
     @Value("${promotion.level}")
@@ -59,9 +63,17 @@ public class CartService {
 
         Double totalPrice = getTotalPrice(orderMap, code);
 
+        ExchangeRequest exchangeRequest = ExchangeRequest.builder()
+                .amount(BigDecimal.valueOf(totalPrice))
+                .currency(Currency.USD)
+                .build();
+
+        ExchangeResult totalPriceUSD = currencyExchangeService.exchange(exchangeRequest);
+
         return CartOrder.builder()
                 .orderMap(orderMap)
                 .totalPrice(totalPrice)
+                .totalPriceUSD(totalPriceUSD.getAmount().doubleValue())
                 .build();
     }
 

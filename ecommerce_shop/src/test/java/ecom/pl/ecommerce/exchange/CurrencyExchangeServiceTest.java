@@ -39,9 +39,10 @@ class CurrencyExchangeServiceTest {
         exchangeRate.setMid(Double.parseDouble(MID));
         when(exchangeRateService.getLatestExchangeRate(any())).thenReturn(exchangeRate);
 
-        ExchangeRequest exchangeRequest = new ExchangeRequest();
-        exchangeRequest.setAmount(amount);
-        exchangeRequest.setCurrency(Currency.USD);
+        ExchangeRequest exchangeRequest = ExchangeRequest.builder()
+                .amount(amount)
+                .currency(Currency.USD)
+                .build();
 
         // When
         ExchangeResult result = currencyExchangeService.exchange(exchangeRequest);
@@ -67,9 +68,10 @@ class CurrencyExchangeServiceTest {
         exchangeRate.setMid(Double.parseDouble(MID));
         when(exchangeRateService.getLatestExchangeRate(any())).thenReturn(exchangeRate);
 
-        ExchangeRequest exchangeRequest = new ExchangeRequest();
-        exchangeRequest.setAmount(amount);
-        exchangeRequest.setCurrency(Currency.PLN);
+        ExchangeRequest exchangeRequest = ExchangeRequest.builder()
+                .amount(amount)
+                .currency(Currency.PLN)
+                .build();
 
         // When
         ExchangeResult result = currencyExchangeService.exchange(exchangeRequest);

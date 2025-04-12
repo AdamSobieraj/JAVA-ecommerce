@@ -53,13 +53,15 @@ class ExchangeControllerTest {
         expectedResult.setResultAmount(new BigDecimal("87.32"));
         expectedResult.setExchangeRate(new BigDecimal("0.8732"));
 
-        requestUSDtoPLN = new ExchangeRequest();
-        requestUSDtoPLN.setAmount(new BigDecimal(AMOUNT));
-        requestUSDtoPLN.setCurrency(Currency.PLN);
+        requestUSDtoPLN = ExchangeRequest.builder()
+                .currency(Currency.PLN)
+                .amount(new BigDecimal(AMOUNT))
+                .build();
 
-        requestPLNtoUSD = new ExchangeRequest();
-        requestPLNtoUSD.setAmount(new BigDecimal(AMOUNT));
-        requestPLNtoUSD.setCurrency(Currency.USD);
+        requestPLNtoUSD = ExchangeRequest.builder()
+                .currency(Currency.USD)
+                .amount(new BigDecimal(AMOUNT))
+                .build();
     }
 
     @Test

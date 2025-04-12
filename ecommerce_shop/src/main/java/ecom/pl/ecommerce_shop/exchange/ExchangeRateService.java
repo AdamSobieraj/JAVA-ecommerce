@@ -1,7 +1,9 @@
 package ecom.pl.ecommerce_shop.exchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -16,8 +18,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ExchangeRateService {
 
-
-    private final String nbpUrl;
+    @Setter
+    @Value("${exchanges.url}")
+    private String nbpUrl;
 
     private final RestTemplate restTemplate;
     private final ConcurrentHashMap<String, ExchangeRate> exchangeRates = new ConcurrentHashMap<>();
@@ -25,7 +28,6 @@ public class ExchangeRateService {
 
     public ExchangeRateService() {
         this.restTemplate = new RestTemplate();
-        this.nbpUrl = "http://api.nbp.pl/api/exchangerates/tables/A";
         this.scheduler = Executors.newScheduledThreadPool(1);
 
         // Aktualizacja kursów przy uruchomieniu programu
