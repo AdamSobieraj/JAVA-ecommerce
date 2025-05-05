@@ -41,7 +41,6 @@ public class EcommerceMagApplication {
                         loop = false;
                     } else {
                         String message = source + " - Message number " + i;
-                        System.out.println("DATA 22 : " + message.getBytes().length);
                         ProducerRecord< String,byte[]> record = new ProducerRecord<>(topic, null, message.getBytes());
                         producer.send(record);
                         System.out.println("Sent to " + topic + ": " + message);

@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    List<Product> findAllByCategory(String category);
-
     Product findById(UUID id);
 
     @Query(value = "SELECT * FROM Product WHERE category = :category AND available = true ORDER BY price ASC", nativeQuery = true)

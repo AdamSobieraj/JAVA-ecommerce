@@ -48,8 +48,8 @@ public class KafkaDynamicListenerService {
   }
 
   private void createListenerForTopic(KafkaTopicProperties.Topic topic) {
-    ContainerProperties containerProps = new ContainerProperties(topic.getName());
 
+    ContainerProperties containerProps = new ContainerProperties(topic.getName());
     containerProps.setGroupId(groupId);
 
     DefaultKafkaConsumerFactory<String, byte[]> byteArrayConsumerFactory =
@@ -65,9 +65,7 @@ public class KafkaDynamicListenerService {
       record.headers().forEach(header -> headers.put(header.key(), new String(header.value())));
 
       Message<byte[]> message = new GenericMessage<>(record.value(), headers);
-
       ObjectMapper objectMapper = new ObjectMapper();
-
       List<ProductDto> products;
 
       try {
@@ -83,7 +81,6 @@ public class KafkaDynamicListenerService {
 
       // save to db
       magUpdateService.updateMag(products);
-
     });
 
     KafkaMessageListenerContainer< String, byte[]> container =

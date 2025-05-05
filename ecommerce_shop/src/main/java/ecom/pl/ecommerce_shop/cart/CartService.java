@@ -1,8 +1,10 @@
 package ecom.pl.ecommerce_shop.cart;
 
 import ecom.pl.ecommerce_shop.database.*;
-import ecom.pl.ecommerce_shop.exchange.*;
 import ecom.pl.ecommerce_shop.exchange.Currency;
+import ecom.pl.ecommerce_shop.exchange.CurrencyExchangeService;
+import ecom.pl.ecommerce_shop.exchange.ExchangeRequest;
+import ecom.pl.ecommerce_shop.exchange.ExchangeResult;
 import ecom.pl.ecommerce_shop.promotion.PromotionExecutorImp;
 import ecom.pl.ecommerce_shop.promotion.PromotionMode;
 import ecom.pl.ecommerce_shop.user.UserService;
@@ -52,7 +54,6 @@ public class CartService {
     public CartOrder displayCart(String code) {
 
         Map<Product, Integer> orderMap = new HashMap<>();
-
         List<Cart> cart =
                 cartRepository.findAllByUserId(getUserId()).get();
 
@@ -84,8 +85,8 @@ public class CartService {
     }
 
     public Double getTotalPrice(Map<Product, Integer> orderMap, String code) {
-        Integer productAmount = 0;
-        Double totalPrice = 0.0;
+        int productAmount = 0;
+        double totalPrice = 0.0;
 
         for (Map.Entry<Product, Integer> entry : orderMap.entrySet()) {
             totalPrice += entry.getKey().getPrice() * entry.getValue();
@@ -93,21 +94,15 @@ public class CartService {
         }
 
         Optional<PromotionCode> promotionCode = promotionCodeRepository.findById(UUID.fromString(code));
-
         boolean activePromotion = promotionCode.isPresent() && promotionCode.get().getActive();
 
-        if (activePromotion && totalPrice > promotionLevel) {
-            totalPrice = promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, totalPrice);
-        }
-        else {
-            totalPrice = totalPrice - (totalPrice * promotionCode.get().getDiscountPercentage()/100);
-        }
+        totalPrice = (activePromotion && totalPrice > promotionLevel)?
+                promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, totalPrice) :
+                totalPrice - (totalPrice * promotionCode.get().getDiscountPercentage()/100);
 
-        if (productAmount % 2 == 0) {
-            totalPrice = promotionExecutorImp.processPromotionMap(PromotionMode.BUY_2_GET_SEC_HALF, orderMap, productAmount);
-        } else {
-            totalPrice = promotionExecutorImp.processPromotionMap(PromotionMode.BUY_3_GET_1_FOR_1, orderMap, productAmount);
-        }
+        totalPrice = (productAmount % 2 == 0)?
+                promotionExecutorImp.processPromotionMap(PromotionMode.BUY_2_GET_SEC_HALF, orderMap, productAmount) :
+                promotionExecutorImp.processPromotionMap(PromotionMode.BUY_3_GET_1_FOR_1, orderMap, productAmount);
 
         return totalPrice;
     }

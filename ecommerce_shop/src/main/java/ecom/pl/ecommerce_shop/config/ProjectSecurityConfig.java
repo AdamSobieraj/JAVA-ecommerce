@@ -47,7 +47,6 @@ public class ProjectSecurityConfig {
 
         // Enable basic authentication
         httpSecurity.httpBasic(Customizer.withDefaults());
-
         return httpSecurity.build();
     }
 

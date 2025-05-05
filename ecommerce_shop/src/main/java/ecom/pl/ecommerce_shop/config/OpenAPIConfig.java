@@ -13,7 +13,7 @@ public class OpenAPIConfig {
         return new OpenAPI()
                 .info(new Info().title("Product API")
                         .version("1.0")
-                        .description("API do zarządzania produktami"));
+                        .description("API sklepu ecommerce shop"));
     }
 
 }
