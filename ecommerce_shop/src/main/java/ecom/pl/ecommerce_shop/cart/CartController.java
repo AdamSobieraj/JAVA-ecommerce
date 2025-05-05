@@ -48,4 +48,7 @@ public class CartController {
 
 
 // exceptiony controllera
-// zmienić exchamge update
+// zmienić exchamge update shedule
+// testy exceptionów
+// graf
+//readme
