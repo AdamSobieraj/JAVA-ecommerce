@@ -54,12 +54,13 @@ public class CartService {
     public CartOrder displayCart(String code) {
 
         Map<Product, Integer> orderMap = new HashMap<>();
+
         List<Cart> cart =
                 cartRepository.findAllByUserId(getUserId()).get();
 
         for (Cart item : cart) {
-            Product product = productRepository.findById(item.getProductId());
-            orderMap.put(product, item.getQuantity());
+            Optional<Product> product = productRepository.findById(item.getProductId());
+            orderMap.put(product.get(), item.getQuantity());
         }
 
         Double totalPrice = getTotalPrice(orderMap, code);

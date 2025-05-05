@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-    Product findById(UUID id);
+    Optional<Product> findById(UUID id);
 
     @Query(value = "SELECT * FROM Product WHERE category = :category AND available = true ORDER BY price ASC", nativeQuery = true)
     List<Product> findAvailableProductsByCategoryOrderedByPrice(@Param("category") String category);

@@ -142,7 +142,7 @@ class CartServiceTest {
         when(userService.findUserByUsername(any())).thenReturn(Optional.of(user));
         when(userService.getUserFromSecurityContext()).thenReturn(String.valueOf(user));
         when(cartRepository.findAllByUserId(any(UUID.class))).thenReturn(Optional.of(cartList));
-        when(productRepository.findById(cartItem.getProductId())).thenReturn(product);
+        when(productRepository.findById(cartItem.getProductId())).thenReturn(Optional.ofNullable(product));
         when(promotionCodeRepository.findById(promotionCodeUUID)).thenReturn(Optional.of(promotionCode));
         when(currencyExchangeService.exchange(any())).thenReturn(exchangeResult);
         lenient().when(promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, productAmount))

@@ -56,7 +56,7 @@ public class ProductService {
     }
 
     public void deleteProduct(String product) {
-        productRepository.deleteById(Long.valueOf(product));
+        productRepository.deleteById(UUID.fromString(product));
     }
 
     public List<Product> displayProductsByCategory(String category) {
