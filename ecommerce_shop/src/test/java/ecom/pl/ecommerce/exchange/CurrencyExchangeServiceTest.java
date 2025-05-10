@@ -44,8 +44,10 @@ class CurrencyExchangeServiceTest {
     @SneakyThrows
     void testExchange(TestCaseData testData) {
         // Given
-        ExchangeRate exchangeRate = new ExchangeRate();
-        exchangeRate.setMid(Double.parseDouble(MID));
+        ExchangeRate exchangeRate = ExchangeRate.builder()
+                .mid(Double.parseDouble(MID))
+                .build();
+
         when(exchangeRateService.getLatestExchangeRate(any())).thenReturn(exchangeRate);
 
         ExchangeRequest exchangeRequest = ExchangeRequest.builder()
