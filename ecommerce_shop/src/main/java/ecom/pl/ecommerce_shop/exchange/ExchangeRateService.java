@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,27 +20,25 @@ public class ExchangeRateService {
     @Value("${exchanges.url}")
     private String nbpUrl;
 
-    private final RestTemplate restTemplate;
     private final ConcurrentHashMap<String, ExchangeRate> exchangeRates = new ConcurrentHashMap<>();
 
-    public ExchangeRateService() {
-        this.restTemplate = new RestTemplate();
-    }
-
-    @Scheduled(initialDelay = 0, fixedRate = 5 * 60 * 1000) // 0ms delay, runs every 5 minutes
+    @Scheduled(initialDelay = 0, fixedRate = 5 * 60 * 1000)
     public void updateExchangeRates() {
         try {
             log.info("Updating exchange rates");
 
-            // Fetching the response from the API
-            ResponseEntity<String> response = restTemplate.getForEntity(nbpUrl, String.class);
+            WebClient webClient = WebClient.create();
+            ResponseEntity<String> response = webClient.get()
+                    .uri(nbpUrl)
+                    .retrieve()
+                    .toEntity(String.class)
+                    .block();
+
             ObjectMapper objectMapper = new ObjectMapper();
 
-            // Clean the JSON response by removing array brackets if necessary
             String jsonString = response.getBody().replaceAll("^\\[|\\]$", "");
             ExchangeRateTable exchangeRateTable = objectMapper.readValue(jsonString, ExchangeRateTable.class);
 
-            // Clear the existing rates and update with new ones
             exchangeRates.clear();
             exchangeRateTable.getRates().forEach(entry -> {
                 ExchangeRate currency = createExchangeRate(entry);
