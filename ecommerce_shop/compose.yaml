@@ -14,14 +14,16 @@ services:
     ports:
       - "5432:5432"
 
-#  backend:
-#    build:
-#      dockerfile: infrastructure/backend/Dockerfile
-#      context: .
-#    container_name: ecommerce-api
-#    restart: unless-stopped
-#    env_file: .env
-#    ports:
-#      - "8082:8080"
-#    depends_on:
-#      - db
+  backend:
+    build:
+      dockerfile: infrastructure/backend/Dockerfile
+      context: .
+    container_name: ecommerce-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ecommerce
+    ports:
+      - "8082:8080"
+    depends_on:
+      - db
