@@ -19,8 +19,11 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 class UserServiceTest {
+
+    private static final String UUID_TEST = "660e8400-e29b-41d4-a716-556655440037";
 
     @Mock
     private UserRepository userRepository;
@@ -47,6 +50,7 @@ class UserServiceTest {
     @DisplayName("Should register user with encoded password and correct details")
     void testRegisterUser(String username, String rawPassword, String email, String phone, String role) {
         Mockito.when(passwordEncoder.encode(rawPassword)).thenReturn("encoded_" + rawPassword);
+        Mockito.when(userRepository.existsById(any(UUID.class))).thenReturn(Boolean.TRUE);
 
         userService.registerUser(username, rawPassword, email, phone, role);
 
@@ -118,9 +122,10 @@ class UserServiceTest {
 
         Address address = new Address(UUID.randomUUID(), "Main St", "Town", "State", "00000", "Country", null);
 
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
+        Mockito.when(addressRepository.existsById(any(UUID.class))).thenReturn(Boolean.TRUE);
 
-        userService.addUserAddress(1L, address);
+        userService.addUserAddress(UUID_TEST, address);
 
         assertEquals(user, address.getUser());
         Mockito.verify(addressRepository).save(address);

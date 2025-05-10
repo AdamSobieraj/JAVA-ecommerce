@@ -119,7 +119,7 @@ class UserControllerTest {
     @Test
     void testAddUserAddress() throws Exception {
         // Given
-        doNothing().when(userService).addUserAddress(any(Long.class), any(Address.class));
+        doNothing().when(userService).addUserAddress(any(String.class), any(Address.class));
 
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/users/1/addresses")

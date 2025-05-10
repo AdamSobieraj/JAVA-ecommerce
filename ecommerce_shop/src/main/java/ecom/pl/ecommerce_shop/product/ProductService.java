@@ -2,6 +2,7 @@ package ecom.pl.ecommerce_shop.product;
 
 import ecom.pl.ecommerce_shop.database.Product;
 import ecom.pl.ecommerce_shop.database.ProductRepository;
+import ecom.pl.ecommerce_shop.exception.SaveUnsuccessfulException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,12 @@ public class ProductService {
                 .build();
 
         productRepository.save(product);
+
+        boolean exists = productRepository.existsById(product.getId());
+
+        if (!exists) {
+            throw new SaveUnsuccessfulException("Failed to save cart item for product ID: " + product.getId());
+        }
     }
 
     public void addProducts(List<ProductDto> productDtos) {
@@ -53,6 +60,14 @@ public class ProductService {
                 .toList();
 
         productRepository.saveAll(productsSorted);
+
+        for (Product product : productsSorted) {
+            boolean exists = productRepository.existsById(product.getId());
+            if (!exists) {
+                throw new SaveUnsuccessfulException("Failed to save product with ID: " + product.getId());
+            }
+        }
+
     }
 
     public void deleteProduct(String product) {

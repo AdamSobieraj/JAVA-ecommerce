@@ -1,6 +1,8 @@
 package ecom.pl.ecommerce_shop.cart;
 
 import ecom.pl.ecommerce_shop.database.*;
+import ecom.pl.ecommerce_shop.exception.EntityNotFoundInDatabaseException;
+import ecom.pl.ecommerce_shop.exception.SaveUnsuccessfulException;
 import ecom.pl.ecommerce_shop.exchange.Currency;
 import ecom.pl.ecommerce_shop.exchange.CurrencyExchangeService;
 import ecom.pl.ecommerce_shop.exchange.ExchangeRequest;
@@ -31,7 +33,6 @@ public class CartService {
     @Value("${promotion.level}")
     private Integer promotionLevel;
 
-
     public void addProduct(CartItem cartItem) {
 
         Cart cart = Cart.builder()
@@ -42,12 +43,20 @@ public class CartService {
                 .build();
 
         cartRepository.save(cart);
+
+        boolean exists = cartRepository.existsById(cart.getUuid());
+
+        if (!exists) {
+            throw new SaveUnsuccessfulException("Failed to save cart item for product ID: " + cartItem.getProductId());
+        }
     }
 
     public void removeProduct(String cartItemId) {
 
-        Optional<Cart> cartItem = cartRepository.findById(UUID.fromString(cartItemId));
-        cartRepository.delete(cartItem.get());
+        Cart cartItem = cartRepository.findById(UUID.fromString(cartItemId))
+                .orElseThrow(() -> new EntityNotFoundInDatabaseException("Cart item with ID " + cartItemId + " not found"));
+
+        cartRepository.delete(cartItem);
 
     }
 
@@ -56,11 +65,13 @@ public class CartService {
         Map<Product, Integer> orderMap = new HashMap<>();
 
         List<Cart> cart =
-                cartRepository.findAllByUserId(getUserId()).get();
+                cartRepository.findAllByUserId(getUserId())
+                        .orElseThrow(() -> new EntityNotFoundInDatabaseException("No cart found for user with ID " + getUserId()));
 
         for (Cart item : cart) {
-            Optional<Product> product = productRepository.findById(item.getProductId());
-            orderMap.put(product.get(), item.getQuantity());
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new EntityNotFoundInDatabaseException("No cart found for user with ID " + getUserId()));
+            orderMap.put(product, item.getQuantity());
         }
 
         Double totalPrice = getTotalPrice(orderMap, code);

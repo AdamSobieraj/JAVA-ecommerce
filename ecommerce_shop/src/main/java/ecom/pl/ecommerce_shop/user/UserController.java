@@ -45,7 +45,7 @@ public class UserController {
     @Operation(summary = "Get user address", description = "Get user address")
     @PostMapping("/{userId}/addresses")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<String> addUserAddress(@PathVariable Long userId, @RequestBody Address address) {
+    public ResponseEntity<String> addUserAddress(@PathVariable String userId, @RequestBody Address address) {
         userService.addUserAddress(userId, address);
         return ResponseEntity.ok("Address added successfully");
     }

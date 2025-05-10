@@ -17,16 +17,40 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Map<String, String>> handleMethodNotValidException(MethodArgumentNotValidException ex) {
+    protected ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errorsMap = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((ObjectError errorObject) -> {
-            FieldError fieldError = (FieldError) errorObject;
-            String field = fieldError.getField();
-            String message = fieldError.getDefaultMessage();
+        for (ObjectError error : ex.getBindingResult().getAllErrors()) {
+            String field = ((FieldError) error).getField();
+            String message = error.getDefaultMessage();
             errorsMap.put(field, message);
-        });
-
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorsMap);
     }
 
+    @ExceptionHandler(SaveUnsuccessfulException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    protected ResponseEntity<Map<String, String>> handleSaveUnsuccessfulException(SaveUnsuccessfulException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Save failed");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    protected ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Internal Server Error");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(EntityNotFoundInDatabaseException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    protected ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundInDatabaseException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Entity not found");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 }
