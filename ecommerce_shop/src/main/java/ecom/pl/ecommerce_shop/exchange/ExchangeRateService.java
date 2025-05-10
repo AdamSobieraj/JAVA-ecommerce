@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,40 +22,51 @@ public class ExchangeRateService {
     @Value("${exchanges.url}")
     private String nbpUrl;
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
     private final ConcurrentHashMap<String, ExchangeRate> exchangeRates = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler;
 
+    private final ObjectMapper objectMapper;
+
     public ExchangeRateService() {
-        this.restTemplate = new RestTemplate();
+        this.webClient = WebClient.create();
         this.scheduler = Executors.newScheduledThreadPool(1);
-
-        // Aktualizacja kursów przy uruchomieniu programu
+        this.objectMapper = new ObjectMapper();
         updateExchangeRates();
-
-        // Rozpocznij regularne aktualizacje kursów
         scheduleUpdate();
     }
 
     private void updateExchangeRates() {
+        log.info("Updating exchange rates");
+
+        webClient.get()
+                .uri(nbpUrl)
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(this::removeJsonArrayBrackets)
+                .flatMap(this::parseExchangeRateTable)
+                .doOnNext(exchangeRateTable -> {
+                    exchangeRates.clear();
+                    exchangeRateTable.getRates().forEach(entry -> {
+                        ExchangeRate currency = createExchangeRate(entry);
+                        exchangeRates.put(currency.getCode(), currency);
+                    });
+                    log.info("Exchange rates updated successfully");
+                })
+                .doOnError(error -> log.error("Failed to update exchange rates", error))
+                .subscribe();  // trigger subscription (non-blocking)
+    }
+
+    private String removeJsonArrayBrackets(String jsonString) {
+        return jsonString.replaceAll("^\\[|\\]$", "");
+    }
+
+    private Mono<ExchangeRateTable> parseExchangeRateTable(String jsonString) {
         try {
-
-            log.info("Updating exchange rates");
-
-            ResponseEntity<String> response = restTemplate.getForEntity(nbpUrl, String.class);
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            String jsonString = response.getBody().replaceAll("^\\[|\\]$", "");
-            ExchangeRateTable exchangeRateTable = objectMapper.readValue(jsonString, ExchangeRateTable.class);
-
-            exchangeRates.clear();
-            exchangeRateTable.getRates().forEach(entry -> {
-                ExchangeRate currency = createExchangeRate(entry);
-                exchangeRates.put(currency.getCode(), currency);
-            });
-
+            ExchangeRateTable table = objectMapper.readValue(jsonString, ExchangeRateTable.class);
+            return Mono.just(table);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to update exchange rates", e);
+            return Mono.error(new RuntimeException("Failed to parse exchange rate table", e));
         }
     }
 
@@ -72,7 +83,6 @@ public class ExchangeRateService {
     }
 
     private void scheduleUpdate() {
-        scheduler.scheduleAtFixedRate(this::updateExchangeRates, 0, 24, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(this::updateExchangeRates, 24, 24, TimeUnit.HOURS);
     }
-
 }
