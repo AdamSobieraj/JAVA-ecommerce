@@ -5,14 +5,12 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -24,30 +22,25 @@ public class ExchangeRateService {
 
     private final RestTemplate restTemplate;
     private final ConcurrentHashMap<String, ExchangeRate> exchangeRates = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler;
 
     public ExchangeRateService() {
         this.restTemplate = new RestTemplate();
-        this.scheduler = Executors.newScheduledThreadPool(1);
-
-        // Aktualizacja kursów przy uruchomieniu programu
-        updateExchangeRates();
-
-        // Rozpocznij regularne aktualizacje kursów
-        scheduleUpdate();
     }
 
-    private void updateExchangeRates() {
+    @Scheduled(initialDelay = 0, fixedRate = 5 * 60 * 1000) // 0ms delay, runs every 5 minutes
+    public void updateExchangeRates() {
         try {
-
             log.info("Updating exchange rates");
 
+            // Fetching the response from the API
             ResponseEntity<String> response = restTemplate.getForEntity(nbpUrl, String.class);
             ObjectMapper objectMapper = new ObjectMapper();
 
+            // Clean the JSON response by removing array brackets if necessary
             String jsonString = response.getBody().replaceAll("^\\[|\\]$", "");
             ExchangeRateTable exchangeRateTable = objectMapper.readValue(jsonString, ExchangeRateTable.class);
 
+            // Clear the existing rates and update with new ones
             exchangeRates.clear();
             exchangeRateTable.getRates().forEach(entry -> {
                 ExchangeRate currency = createExchangeRate(entry);
@@ -55,14 +48,14 @@ public class ExchangeRateService {
             });
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to update exchange rates", e);
+            log.error("Failed to update exchange rates", e);
         }
     }
 
     private ExchangeRate createExchangeRate(ExchangeRate currency) {
         return ExchangeRate.builder()
                 .code(currency.getCode())
-                .currency(currency.getCode())  // Assuming the currency code and name are the same
+                .currency(currency.getCode())
                 .mid(currency.getMid())
                 .build();
     }
@@ -70,9 +63,4 @@ public class ExchangeRateService {
     public ExchangeRate getLatestExchangeRate(String currencyCode) {
         return exchangeRates.getOrDefault(currencyCode, null);
     }
-
-    private void scheduleUpdate() {
-        scheduler.scheduleAtFixedRate(this::updateExchangeRates, 0, 24, TimeUnit.HOURS);
-    }
-
 }
