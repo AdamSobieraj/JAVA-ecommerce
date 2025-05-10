@@ -35,9 +35,8 @@ class UsdToPlnStrategyTest {
     void testExchangeUsdToPln() {
         // Given
         BigDecimal amount = new BigDecimal(AMOUNT);
-        ExchangeRate exchangeRate = ExchangeRate.builder()
-                .mid(Double.parseDouble(MID))
-                .build();
+        ExchangeRate exchangeRate = new ExchangeRate();
+        exchangeRate.setMid(Double.parseDouble(MID));
 
         when(exchangeRateService.getLatestExchangeRate(Currency.USD.getCode())).thenReturn(exchangeRate);
 

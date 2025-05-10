@@ -34,28 +34,31 @@ public class ExchangeRateService {
                     .toEntity(String.class)
                     .block();
 
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            String jsonString = response.getBody().replaceAll("^\\[|\\]$", "");
-            ExchangeRateTable exchangeRateTable = objectMapper.readValue(jsonString, ExchangeRateTable.class);
-
-            exchangeRates.clear();
-            exchangeRateTable.getRates().forEach(entry -> {
-                ExchangeRate currency = createExchangeRate(entry);
-                exchangeRates.put(currency.getCode(), currency);
-            });
+            parseExchangeRateTable(response);
 
         } catch (IOException e) {
             log.error("Failed to update exchange rates", e);
         }
     }
 
+    public void parseExchangeRateTable(ResponseEntity<String> response) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = response.getBody().replaceAll("^\\[|\\]$", "");
+        ExchangeRateTable exchangeRateTable = objectMapper.readValue(jsonString, ExchangeRateTable.class);
+
+        exchangeRates.clear();
+        exchangeRateTable.getRates().forEach(entry -> {
+            ExchangeRate currency = createExchangeRate(entry);
+            exchangeRates.put(currency.getCode(), currency);
+        });
+    }
+
     private ExchangeRate createExchangeRate(ExchangeRate currency) {
-        return ExchangeRate.builder()
-                .code(currency.getCode())
-                .currency(currency.getCode())
-                .mid(currency.getMid())
-                .build();
+        ExchangeRate exchangeRate = new ExchangeRate();
+        exchangeRate.setCode(currency.getCode());
+        exchangeRate.setCurrency(currency.getCode());
+        exchangeRate.setMid(currency.getMid());
+        return exchangeRate;
     }
 
     public ExchangeRate getLatestExchangeRate(String currencyCode) {

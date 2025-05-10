@@ -1,11 +1,6 @@
 package ecom.pl.ecommerce.exchange;
 
-import ecom.pl.ecommerce_shop.exchange.Currency;
-import ecom.pl.ecommerce_shop.exchange.CurrencyExchangeService;
-import ecom.pl.ecommerce_shop.exchange.ExchangeRate;
-import ecom.pl.ecommerce_shop.exchange.ExchangeRateService;
-import ecom.pl.ecommerce_shop.exchange.ExchangeRequest;
-import ecom.pl.ecommerce_shop.exchange.ExchangeResult;
+import ecom.pl.ecommerce_shop.exchange.*;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -17,7 +12,8 @@ import org.mockito.MockitoAnnotations;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -44,9 +40,8 @@ class CurrencyExchangeServiceTest {
     @SneakyThrows
     void testExchange(TestCaseData testData) {
         // Given
-        ExchangeRate exchangeRate = ExchangeRate.builder()
-                .mid(Double.parseDouble(MID))
-                .build();
+        ExchangeRate exchangeRate = new ExchangeRate();
+        exchangeRate.setMid(Double.parseDouble(MID));
 
         when(exchangeRateService.getLatestExchangeRate(any())).thenReturn(exchangeRate);
 
