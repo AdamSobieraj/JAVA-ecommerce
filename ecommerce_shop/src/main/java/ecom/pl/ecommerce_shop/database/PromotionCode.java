@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "promotion_codes")
@@ -21,7 +22,7 @@ public class PromotionCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "code", unique = true, nullable = false)
     private String code;

@@ -106,15 +106,18 @@ public class CartService {
         }
 
         Optional<PromotionCode> promotionCode = promotionCodeRepository.findById(UUID.fromString(code));
+
         boolean activePromotion = promotionCode.isPresent() && promotionCode.get().getActive();
 
-        totalPrice = (activePromotion && totalPrice > promotionLevel)?
-                promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, totalPrice) :
-                totalPrice - (totalPrice * promotionCode.get().getDiscountPercentage()/100);
+        if (activePromotion && totalPrice > promotionLevel) {
+            totalPrice = totalPrice - promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, totalPrice);
+        }
 
-        totalPrice = (productAmount % 2 == 0)?
-                promotionExecutorImp.processPromotionMap(PromotionMode.BUY_2_GET_SEC_HALF, orderMap, productAmount) :
-                promotionExecutorImp.processPromotionMap(PromotionMode.BUY_3_GET_1_FOR_1, orderMap, productAmount);
+        if (productAmount % 2 == 0) {
+            totalPrice = totalPrice - promotionExecutorImp.processPromotionMap(PromotionMode.BUY_2_GET_SEC_HALF, orderMap, productAmount);
+        } else {
+            totalPrice = totalPrice - promotionExecutorImp.processPromotionMap(PromotionMode.BUY_3_GET_1_FOR_1, orderMap, productAmount);
+        }
 
         return totalPrice;
     }
