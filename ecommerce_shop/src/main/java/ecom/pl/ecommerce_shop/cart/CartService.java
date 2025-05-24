@@ -35,16 +35,36 @@ public class CartService {
 
     public void addProduct(CartItem cartItem) {
 
-        Cart cart = Cart.builder()
-                .uuid(UUID.randomUUID())
-                .productId(UUID.fromString(cartItem.getProductId()))
-                .quantity(Integer.valueOf(cartItem.getQuantity()))
-                .userId(getUserId())
-                .build();
+        Cart cart;
+        UUID userId = getUserId();
+        UUID productId = UUID.fromString(cartItem.getProductId());
+        boolean exist = cartRepository.existsByUserId(userId);
+        boolean exists;
 
-        cartRepository.save(cart);
+        if (exist) {
+            List<Cart> cartList = cartRepository.findAllByUserId(userId).orElse(new ArrayList<>());
 
-        boolean exists = cartRepository.existsById(cart.getUuid());
+            cartList.stream()
+                    .filter(cartDto -> cartDto.getProductId().equals(productId))
+                    .findFirst()
+                    .ifPresent(cartDto -> {
+                        cartDto.setQuantity(cartDto.getQuantity() + Integer.parseInt(cartItem.getQuantity()));
+                        cartRepository.save(cartDto);
+                    });
+            exists = true;
+
+        } else {
+
+            cart = Cart.builder()
+                    .uuid(UUID.randomUUID())
+                    .productId(UUID.fromString(cartItem.getProductId()))
+                    .quantity(Integer.valueOf(cartItem.getQuantity()))
+                    .userId(getUserId())
+                    .build();
+
+            cartRepository.save(cart);
+            exists = cartRepository.existsById(cart.getUuid());
+        }
 
         if (!exists) {
             throw new SaveUnsuccessfulException("Failed to save cart item for product ID: " + cartItem.getProductId());
