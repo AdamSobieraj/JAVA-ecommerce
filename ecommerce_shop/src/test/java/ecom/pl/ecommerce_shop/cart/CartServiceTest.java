@@ -61,7 +61,7 @@ class CartServiceTest {
             "'3428d53f-92e7-400e-8db7-f4b5b40e7c27', 25.0, 6, 155.0",   // Apply BUY_2_GET_SEC_HALF promotion
             "'29e3b2c4-e6fd-49b4-bd65-3b7de6be8992', 60.0, 5, 90.0"    // Apply BUY_3_GET_1_FOR_1 promotion
     })
-    void testGetTotalPrice(String code, double expectedTotaldiscount, int productAmount, double expectedPrice) {
+    void testGetTotalPrice(String code, double expectedTotalDiscount, int productAmount, double expectedPrice) {
         // Given
         Map<Product, Integer> orderMap = new HashMap<>();
         Product product = Product.builder()
@@ -84,11 +84,11 @@ class CartServiceTest {
         when(promotionCodeRepository.findById(promotionCodeUUID)).thenReturn(Optional.of(promotionCode));
         // Lenient stubbing: Allow mismatches in stubbing arguments
         lenient().when(promotionExecutorImp.processPromotionMap(PromotionMode.GET_10_PERCENT_OFF, orderMap, productAmount))
-                .thenReturn(expectedTotaldiscount);
+                .thenReturn(expectedTotalDiscount);
         lenient().when(promotionExecutorImp.processPromotionMap(PromotionMode.BUY_2_GET_SEC_HALF, orderMap, productAmount))
-                .thenReturn(expectedTotaldiscount);
+                .thenReturn(expectedTotalDiscount);
         lenient().when(promotionExecutorImp.processPromotionMap(PromotionMode.BUY_3_GET_1_FOR_1, orderMap, productAmount))
-                .thenReturn(expectedTotaldiscount);
+                .thenReturn(expectedTotalDiscount);
 
         // When
         double totalPrice = cartService.getTotalPrice(orderMap, code);
